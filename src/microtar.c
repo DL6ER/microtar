@@ -60,14 +60,14 @@ static unsigned checksum(const mtar_raw_header_t* rh) {
 }
 
 
-static int tread(mtar_t *tar, void *data, unsigned size) {
+static int tread(mtar_t *tar, void *data, size_t size) {
   int err = tar->read(tar, data, size);
   tar->pos += size;
   return err;
 }
 
 
-static int twrite(mtar_t *tar, const void *data, unsigned size) {
+static int twrite(mtar_t *tar, const void *data, size_t size) {
   int err = tar->write(tar, data, size);
   tar->pos += size;
   return err;
@@ -155,18 +155,18 @@ const char* mtar_strerror(int err) {
 }
 
 
-static int file_write(mtar_t *tar, const void *data, unsigned size) {
-  unsigned res = fwrite(data, 1, size, tar->stream);
+static int file_write(mtar_t *tar, const void *data, size_t size) {
+  size_t res = fwrite(data, 1, size, tar->stream);
   return (res == size) ? MTAR_ESUCCESS : MTAR_EWRITEFAIL;
 }
 
-static int file_read(mtar_t *tar, void *data, unsigned size) {
-  unsigned res = fread(data, 1, size, tar->stream);
+static int file_read(mtar_t *tar, void *data, size_t size) {
+  size_t res = fread(data, 1, size, tar->stream);
   return (res == size) ? MTAR_ESUCCESS : MTAR_EREADFAIL;
 }
 
-static int file_seek(mtar_t *tar, unsigned offset) {
-  int res = fseek(tar->stream, offset, SEEK_SET);
+static int file_seek(mtar_t *tar, size_t offset) {
+  size_t res = fseek(tar->stream, offset, SEEK_SET);
   return (res == 0) ? MTAR_ESUCCESS : MTAR_ESEEKFAIL;
 }
 
@@ -175,7 +175,7 @@ static int file_close(mtar_t *tar) {
   return MTAR_ESUCCESS;
 }
 
-static int mem_write(mtar_t *tar, const void *data, unsigned size) {
+static int mem_write(mtar_t *tar, const void *data, size_t size) {
   mtar_mem_stream_t *mem = tar->stream;
 
   if(!mem || mem->pos + size >= mem->size) {
@@ -188,7 +188,7 @@ static int mem_write(mtar_t *tar, const void *data, unsigned size) {
   return MTAR_ESUCCESS;
 }
 
-static int mem_read(mtar_t *tar, void *data, unsigned size) {
+static int mem_read(mtar_t *tar, void *data, size_t size) {
   mtar_mem_stream_t *mem = tar->stream;
 
   if(!mem || mem->pos + size >= mem->size) {
@@ -201,7 +201,7 @@ static int mem_read(mtar_t *tar, void *data, unsigned size) {
   return MTAR_ESUCCESS;
 }
 
-static int mem_seek(mtar_t *tar, unsigned offset) {
+static int mem_seek(mtar_t *tar, size_t offset) {
   mtar_mem_stream_t *mem = tar->stream;
 
   if(!mem || offset >= mem->size)
@@ -286,7 +286,7 @@ int mtar_close(mtar_t *tar) {
 }
 
 
-int mtar_seek(mtar_t *tar, unsigned pos) {
+int mtar_seek(mtar_t *tar, size_t pos) {
   int err = tar->seek(tar, pos);
   tar->pos = pos;
   return err;
@@ -360,7 +360,7 @@ int mtar_read_header(mtar_t *tar, mtar_header_t *h) {
 }
 
 
-int mtar_read_data(mtar_t *tar, void *ptr, unsigned size) {
+int mtar_read_data(mtar_t *tar, void *ptr, size_t size) {
   int err;
   /* If we have no remaining data then this is the first read, we get the size,
    * set the remaining data and seek to the beginning of the data */
@@ -402,7 +402,7 @@ int mtar_write_header(mtar_t *tar, const mtar_header_t *h) {
 }
 
 
-int mtar_write_file_header(mtar_t *tar, const char *name, unsigned size) {
+int mtar_write_file_header(mtar_t *tar, const char *name, size_t size) {
   mtar_header_t h;
   /* Build header */
   memset(&h, 0, sizeof(h));
@@ -427,7 +427,7 @@ int mtar_write_dir_header(mtar_t *tar, const char *name) {
 }
 
 
-int mtar_write_data(mtar_t *tar, const void *data, unsigned size) {
+int mtar_write_data(mtar_t *tar, const void *data, size_t size) {
   int err;
   /* Write data */
   err = twrite(tar, data, size);
