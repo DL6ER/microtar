@@ -47,20 +47,20 @@ typedef struct {
 struct mmap_info {
   int fd;
   unsigned char *data;
-  unsigned size;
+  size_t size;
 };
 
-static int file_write(mtar_t *tar, const void *data, unsigned size) {
+static int file_write(mtar_t *tar, const void *data, size_t size) {
   memcpy(((struct mmap_info*) tar->stream)->data + tar->pos, data, size);
   return MTAR_ESUCCESS;
 }
 
-static int file_read(mtar_t *tar, void *data, unsigned size) {
+static int file_read(mtar_t *tar, void *data, size_t size) {
   memcpy(data, ((struct mmap_info*) tar->stream)->data + tar->pos, size);
   return MTAR_ESUCCESS;
 }
 
-static int file_seek(mtar_t *tar, unsigned offset) {
+static int file_seek(mtar_t *tar, size_t offset) {
   tar->pos = offset;
   if (tar->pos > ((struct mmap_info*) tar->stream)->size) {
     return MTAR_ESEEKFAIL;
